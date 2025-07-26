@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Peserta - BANSOS SCORE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./assets/logo banscor.png">
+    <style>
+        .bg-pattern {
+            background-color: #f9fafb;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e5e7eb' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .form-section {
+            scroll-margin-top: 100px;
+        }
+        
+        .step-active {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .step-completed {
+            background-color: #22c55e;
+            color: white;
+        }
+        
+        .step-inactive {
+            background-color: #e5e7eb;
+            color: #6b7280;
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: #ef4444;
+        }
+        
+        @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+        
+        .pulse-icon {
+            animation: pulse-border 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-pattern font-sans min-h-screen flex flex-col">
+    <!-- Header/Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="flex items-center">
+                        <div class="text-red-600 font-bold text-2xl mr-3">
+                            <img src="./assets/logo banscor.png" alt="Logo BANSOS SCORE" class="h-10 w-auto">
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-2xl text-gray-800">BANSOS SCORE</h1>
+                            <p class="text-xs text-gray-500">Sistem Scoring Kelayakan Bantuan Sosial</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <nav class="hidden md:flex space-x-6">
+                    <a href="{{ url_for('index') }}" class="text-gray-800 hover:text-red-600 font-medium">Beranda</a>
+                    <a href="{{ url_for('index') }}#tentang" class="text-gray-800 hover:text-red-600 font-medium">Tentang</a>
+                    <a href="{{ url_for('index') }}#langkah" class="text-gray-800 hover:text-red-600 font-medium">Cara Daftar</a>
+                    <a href="{{ url_for('index') }}#berita" class="text-gray-800 hover:text-red-600 font-medium">Berita</a>
+                    <a href="{{ url_for('index') }}#kontak" class="text-gray-800 hover:text-red-600 font-medium">Kontak</a>
+                </nav>
+                
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-gray-800 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu (hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <div class="flex flex-col space-y-3">
+                    <a href="{{ url_for('index') }}" class="text-gray-800 hover:text-red-600 font-medium">Beranda</a>
+                    <a href="{{ url_for('index') }}#tentang" class="text-gray-800 hover:text-red-600 font-medium">Tentang</a>
+                    <a href="{{ url_for('index') }}#langkah" class="text-gray-800 hover:text-red-600 font-medium">Cara Daftar</a>
+                    <a href="{{ url_for('index') }}#berita" class="text-gray-800 hover:text-red-600 font-medium">Berita</a>
+                    <a href="{{ url_for('index') }}#kontak" class="text-gray-800 hover:text-red-600 font-medium">Kontak</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <div class="container mx-auto px-4 py-12">
+            <!-- Page Title -->
+            <div class="text-center mb-10 animate__animated animate__fadeIn">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Formulir Pendaftaran BANSOS SCORE</h1>
+                <p class="text-gray-600 max-w-2xl mx-auto">Isi formulir berikut dengan lengkap dan benar untuk mendaftarkan diri Anda dalam program bantuan sosial</p>
+            </div>
+            
+            <!-- Progress Steps -->
+            <div class="max-w-4xl mx-auto mb-10 px-4">
+                <div class="flex flex-wrap justify-between relative">
+                    <!-- Progress Bar -->
+                    <div class="absolute top-5 left-0 right-0 h-1 bg-gray-200 z-0">
+                        <div id="progress-bar" class="h-full bg-red-500 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center relative z-10">
+                        <div id="step-1" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-2 step-active">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="text-sm text-gray-600">Data Pribadi</span>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center relative z-10">
+                        <div id="step-2" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-2 step-inactive">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <span class="text-sm text-gray-600">Tempat Tinggal</span>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center relative z-10">
+                        <div id="step-3" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-2 step-inactive">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <span class="text-sm text-gray-600">Finansial</span>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center relative z-10">
+                        <div id="step-4" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-2 step-inactive">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <span class="text-sm text-gray-600">Dokumen</span>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center relative z-10">
+                        <div id="step-5" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-2 step-inactive">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span class="text-sm text-gray-600">Konfirmasi</span>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Form Container -->
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden mb-10">
+                <form id="registration-form" action="{{ url_for('submit_registration') }}" method="post">
+                    <!-- Form Section 1: Data Pribadi -->
+                    <section id="section-1" class="form-section p-8 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-center mb-8">
+                            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center pulse-icon">
+                                <i class="fas fa-user-edit text-red-600 text-2xl"></i>
+                            </div>
+                        </div>
+                        
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Data Pribadi</h2>
+                        <p class="text-gray-600 mb-8 text-center">Isi informasi data diri Anda dengan lengkap dan benar</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- NIK -->
+                            <div>
+                                <label for="nik" class="block text-gray-700 font-medium mb-2 required-field">NIK</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-id-card text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="nik" name="nik" placeholder="Masukkan 16 digit NIK" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required pattern="[0-9]{16}" maxlength="16">
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Contoh: 3171066501880001</p>
+                            </div>
+                            
+                            <!-- Nama Lengkap -->
+                            <div>
+                                <label for="fullname" class="block text-gray-700 font-medium mb-2 required-field">Nama Lengkap</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-user text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="fullname" name="fullname" placeholder="Masukkan nama lengkap sesuai KTP" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Tempat Lahir -->
+                            <div>
+                                <label for="birthplace" class="block text-gray-700 font-medium mb-2 required-field">Tempat Lahir</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-map-marker-alt text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="birthplace" name="birthplace" placeholder="Masukkan tempat lahir" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Tanggal Lahir -->
+                            <div>
+                                <label for="birthdate" class="block text-gray-700 font-medium mb-2 required-field">Tanggal Lahir</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-calendar-alt text-gray-400"></i>
+                                    </div>
+                                    <input type="date" id="birthdate" name="birthdate" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Jenis Kelamin -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2 required-field">Jenis Kelamin</label>
+                                <div class="flex space-x-4">
+                                    <div class="flex items-center">
+                                        <input type="radio" id="gender-male" name="gender" value="male" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-600" required>
+                                        <label for="gender-male" class="ml-2 text-gray-700">Laki-laki</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="gender-female" name="gender" value="female" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-600" required>
+                                        <label for="gender-female" class="ml-2 text-gray-700">Perempuan</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Perkawinan -->
+                            <div>
+                                <label for="marital" class="block text-gray-700 font-medium mb-2 required-field">Status Perkawinan</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-ring text-gray-400"></i>
+                                    </div>
+                                    <select id="marital" name="marital" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition appearance-none bg-white" required>
+                                        <option value="" disabled selected>Pilih status perkawinan</option>
+                                        <option value="single">Belum Kawin</option>
+                                        <option value="married">Kawin</option>
+                                        <option value="divorced">Cerai Hidup</option>
+                                        <option value="widowed">Cerai Mati</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Pendidikan Terakhir -->
+                            <div>
+                                <label for="education" class="block text-gray-700 font-medium mb-2 required-field">Pendidikan Terakhir</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-graduation-cap text-gray-400"></i>
+                                    </div>
+                                    <select id="education" name="education" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition appearance-none bg-white" required>
+                                        <option value="" disabled selected>Pilih pendidikan terakhir</option>
+                                        <option value="none">Tidak Sekolah</option>
+                                        <option value="sd">SD/Sederajat</option>
+                                        <option value="smp">SMP/Sederajat</option>
+                                        <option value="sma">SMA/Sederajat</option>
+                                        <option value="d1">D1/D2/D3</option>
+                                        <option value="s1">S1</option>
+                                        <option value="s2">S2</option>
+                                        <option value="s3">S3</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Pekerjaan -->
+                            <div>
+                                <label for="job" class="block text-gray-700 font-medium mb-2 required-field">Pekerjaan</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-briefcase text-gray-400"></i>
+                                    </div>
+                                    <select id="job" name="job" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition appearance-none bg-white" required>
+                                        <option value="" disabled selected>Pilih pekerjaan</option>
+                                        <option value="unemployed">Tidak Bekerja</option>
+                                        <option value="farmer">Petani</option>
+                                        <option value="fisherman">Nelayan</option>
+                                        <option value="labor">Buruh</option>
+                                        <option value="private">Karyawan Swasta</option>
+                                        <option value="civil_servant">PNS</option>
+                                        <option value="entrepreneur">Wiraswasta</option>
+                                        <option value="driver">Sopir/Ojek</option>
+                                        <option value="housewife">Ibu Rumah Tangga</option>
+                                        <option value="retired">Pensiunan</option>
+                                        <option value="other">Lainnya</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- No Telepon -->
+                            <div>
+                                <label for="phone" class="block text-gray-700 font-medium mb-2 required-field">Nomor Telepon</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-phone text-gray-400"></i>
+                                    </div>
+                                    <input type="tel" id="phone" name="phone" placeholder="Masukkan nomor telepon aktif" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Contoh: 081234567890</p>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-envelope text-gray-400"></i>
+                                    </div>
+                                    <input type="email" id="email" name="email" placeholder="Masukkan alamat email (opsional)" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition">
+                                </div>
+                            </div>
+                            
+                            <!-- No BPJS -->
+                            <div>
+                                <label for="bpjs" class="block text-gray-700 font-medium mb-2">Nomor BPJS Kesehatan</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-heartbeat text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="bpjs" name="bpjs" placeholder="Masukkan nomor BPJS (jika ada)" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition">
+                                </div>
+                            </div>
+                            
+                            <!-- Jumlah Anggota Keluarga -->
+                            <div>
+                                <label for="family_members" class="block text-gray-700 font-medium mb-2 required-field">Jumlah Anggota Keluarga</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-users text-gray-400"></i>
+                                    </div>
+                                    <input type="number" id="family_members" name="family_members" min="1" max="20" placeholder="Masukkan jumlah anggota keluarga" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Termasuk diri sendiri</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex justify-end">
+                            <button type="button" id="next-1" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 ease-in-out shadow-lg flex items-center">
+                                Lanjut <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </section>
+                    
+                    <!-- Form Section 2: Tempat Tinggal -->
+                    <section id="section-2" class="form-section p-8 hidden animate__animated">
+                        <div class="flex items-center justify-center mb-8">
+                            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center pulse-icon">
+                                <i class="fas fa-home text-red-600 text-2xl"></i>
+                            </div>
+                        </div>
+                        
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Informasi Tempat Tinggal</h2>
+                        <p class="text-gray-600 mb-8 text-center">Isi informasi tempat tinggal Anda dengan lengkap dan benar</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Alamat -->
+                            <div class="md:col-span-2">
+                                <label for="address" class="block text-gray-700 font-medium mb-2 required-field">Alamat Lengkap</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-map-marker-alt text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="address" name="address" placeholder="Masukkan alamat lengkap" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                            </div>
+                            
+                            <!-- RT/RW -->
+                            <div>
+                                <label for="rt" class="block text-gray-700 font-medium mb-2 required-field">RT</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-file-alt text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="rt" name="rt" placeholder="Masukkan RT" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="rw" class="block text-gray-700 font-medium mb-2 required-field">RW</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-file-alt text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="rw" name="rw" placeholder="Masukkan RW" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Kelurahan/Desa -->
+                            <div>
+                                <label for="village" class="block text-gray-700 font-medium mb-2 required-field">Kelurahan/Desa</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-city text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="village" name="village" placeholder="Masukkan Kelurahan/Desa" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Kecamatan -->
+                            <div>
+                                <label for="district" class="block text-gray-700 font-medium mb-2 required-field">Kecamatan</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-city text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="district" name="district" placeholder="Masukkan

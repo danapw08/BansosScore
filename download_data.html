@@ -1,0 +1,1154 @@
+
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Dropdown checklist
+        const dropdownList = document.querySelector('.dropdown-check-list');
+        const anchor = dropdownList.querySelector('.anchor');
+        const items = dropdownList.querySelector('.items');
+        
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            items.classList.toggle('visible');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!dropdownList.contains(e.target)) {
+                items.classList.remove('visible');
+            }
+        });
+        
+        // Update anchor text based on selections
+        const checkboxes = items.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateAnchorText);
+        });
+        
+        function updateAnchorText() {
+            const checked = Array.from(checkboxes).filter(cb => cb.checked);
+            const anchorSpan = anchor.querySelector('span');
+            
+            if (checked.length === 0) {
+                anchorSpan.textContent = 'Pilih Kategori';
+            } else if (checked.length === 1) {
+                anchorSpan.textContent = checked[0].nextElementSibling.textContent.trim();
+            } else {
+                anchorSpan.textContent = `${checked.length} kategori terpilih`;
+            }
+        }
+        
+        // Score range slider
+        const minScoreSlider = document.getElementById('min-score');
+        const maxScoreSlider = document.getElementById('max-score');
+        const scoreRangeLabel = document.getElementById('score-range-label');
+        
+        function updateScoreRangeLabel() {
+            const minScore = parseInt(minScoreSlider.value);
+            const maxScore = parseInt(maxScoreSlider.value);
+            
+            if (minScore > maxScore) {
+                maxScoreSlider.value = minScore;
+            }
+            
+            scoreRangeLabel.textContent = `${minScoreSlider.value} - ${maxScoreSlider.value}`;
+        }
+        
+        minScoreSlider.addEventListener('input', updateScoreRangeLabel);
+        maxScoreSlider.addEventListener('input', updateScoreRangeLabel);
+        
+        // Download dropdown
+        const downloadBtn = document.getElementById('download-btn');
+        const downloadOptions = document.getElementById('download-options');
+        
+        downloadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            downloadOptions.classList.toggle('hidden');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!downloadBtn.contains(e.target) && !downloadOptions.contains(e.target)) {
+                downloadOptions.classList.add('hidden');
+            }
+        });
+        
+        // Initialize charts
+        function initCharts() {
+            // Score Distribution Chart
+            const scoreDistributionCtx = document.getElementById('scoreDistributionChart').getContext('2d');
+            const scoreDistributionChart = new Chart(scoreDistributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-20', '21-40', '41-60', '61-80', '81-100'],
+                    datasets: [{
+                        label: 'Jumlah Pendaftar',
+                        data: [59, 123, 254, 421, 383],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(249, 115, 22, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(5, 150, 105, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(249, 115, 22, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(5, 150, 105, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Jumlah: ${context.raw} orang`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Jumlah Pendaftar'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Rentang Skor'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Region Distribution Chart
+            const regionDistributionCtx = document.getElementById('regionDistributionChart').getContext('2d');
+            const regionDistributionChart = new Chart(regionDistributionCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Banten', 'Lainnya'],
+                    datasets: [{
+                        data: [325, 278, 213, 187, 156, 81],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(139, 92, 246, 0.7)',
+                            'rgba(107, 114, 128, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(107, 114, 128, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Aid Type Distribution Chart
+            const aidTypeDistributionCtx = document.getElementById('aidTypeDistributionChart').getContext('2d');
+            const aidTypeDistributionChart = new Chart(aidTypeDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['BLT', 'BPNT', 'PKH', 'KIP', 'KIS', 'Lainnya'],
+                    datasets: [{
+                        data: [412, 356, 287, 198, 156, 72],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(139, 92, 246, 0.7)',
+                            'rgba(236, 72, 153, 0.7)',
+                            'rgba(107, 114, 128, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(236, 72, 153, 1)',
+                            'rgba(107, 114, 128, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Income Distribution Chart
+            const incomeDistributionCtx = document.getElementById('incomeDistributionChart').getContext('2d');
+            const incomeDistributionChart = new Chart(incomeDistributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sangat Rendah (<1jt)', 'Rendah (1-2jt)', 'Menengah (2-4jt)', 'Tinggi (>4jt)'],
+                    datasets: [{
+                        label: 'Jumlah Pendaftar',
+                        data: [485, 376, 298, 81],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(16, 185, 129, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(16, 185, 129, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${value} orang (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Jumlah Pendaftar'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize charts when the page loads
+        window.addEventListener('load', initCharts);
+        
+        // Form submission
+        document.getElementById('filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // In a real application, this would make an AJAX request to get filtered data
+            // For demo purposes, we'll just show a loading state and then refresh the page
+            
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Mencari...`;
+            
+            // Simulate loading
+            setTimeout(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+                
+                // Show a notification
+                alert('Filter telah diterapkan. Dalam aplikasi sesungguhnya, data akan diperbarui sesuai filter yang dipilih.');
+            }, 1500);
+        });
+        
+        // Reset form
+        document.getElementById('filter-form').addEventListener('reset', function() {
+            // Reset score range
+            minScoreSlider.value = 0;
+            maxScoreSlider.value = 100;
+            updateScoreRangeLabel();
+            
+            // Reset checkboxes
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
+            updateAnchorText();
+            
+            // In a real application, this would reset the data to its original state
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengambilan Data Lembaga - BANSOS SCORE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/images/heart.png">
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        .bg-pattern {
+            background-color: #f9fafb;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e5e7eb' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .dropdown-check-list {
+            display: inline-block;
+            position: relative;
+            width: 100%;
+        }
+        
+        .dropdown-check-list .anchor {
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            width: 100%;
+        }
+        
+        .dropdown-check-list .anchor:after {
+            position: absolute;
+            content: "";
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #000;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .dropdown-check-list .anchor:active:after {
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #000;
+            border-top: 0;
+        }
+        
+        .dropdown-check-list ul.items {
+            padding: 0.5rem;
+            display: none;
+            margin: 0;
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .dropdown-check-list ul.items.visible {
+            display: block;
+        }
+        
+        .dropdown-check-list ul.items li {
+            margin: 0.25rem 0;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+            }
+        }
+        
+        .pulse-icon {
+            animation: pulse-border 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-pattern font-sans min-h-screen flex flex-col">
+    <!-- Header/Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <div class="text-red-600 font-bold text-2xl mr-3">
+                            <img src="./assets/logo banscor.png" alt="Logo BANSOS SCORE" class="h-10 w-auto">
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-2xl text-gray-800">BANSOS SCORE</h1>
+                            <p class="text-xs text-gray-500">Sistem Scoring Kelayakan Bantuan Sosial</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <nav class="hidden md:flex space-x-6">
+                    <a href="index.html" class="text-gray-800 hover:text-red-600 font-medium">Beranda</a>
+                    <a href="index.html#tentang" class="text-gray-800 hover:text-red-600 font-medium">Tentang</a>
+                    <a href="bansos-check-status-page.html" class="text-gray-800 hover:text-red-600 font-medium">Cek Status</a>
+                    <a href="index.html#berita" class="text-gray-800 hover:text-red-600 font-medium">Berita</a>
+                    <a href="index.html#kontak" class="text-gray-800 hover:text-red-600 font-medium">Kontak</a>
+                </nav>
+                
+                <div class="flex items-center">
+                    <div class="hidden md:flex items-center mr-4">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <span class="ml-2 text-gray-800">Admin Lembaga</span>
+                    </div>
+                    
+                    <div class="md:hidden">
+                        <button id="menu-toggle" class="text-gray-800 focus:outline-none">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile menu (hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <div class="flex flex-col space-y-3">
+                    <a href="index.html" class="text-gray-800 hover:text-red-600 font-medium">Beranda</a>
+                    <a href="index.html#tentang" class="text-gray-800 hover:text-red-600 font-medium">Tentang</a>
+                    <a href="bansos-check-status-page.html" class="text-gray-800 hover:text-red-600 font-medium">Cek Status</a>
+                    <a href="index.html#berita" class="text-gray-800 hover:text-red-600 font-medium">Berita</a>
+                    <a href="index.html#kontak" class="text-gray-800 hover:text-red-600 font-medium">Kontak</a>
+                </div>
+                <div class="flex items-center mt-4 pt-3 border-t border-gray-200">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-blue-600"></i>
+                    </div>
+                    <span class="ml-2 text-gray-800">Admin Lembaga</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Page Title -->
+            <div class="text-center mb-8 animate__animated animate__fadeIn">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center pulse-icon">
+                        <i class="fas fa-database text-blue-600 text-2xl"></i>
+                    </div>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Pengambilan Data Penerima Bantuan</h1>
+                <p class="text-gray-600 max-w-2xl mx-auto">Akses dan unduh data penerima bantuan sosial berdasarkan kriteria yang Anda butuhkan</p>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 animate__animated animate__fadeIn">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-filter text-blue-600 mr-2"></i> Filter Data
+                </h2>
+                
+                <form id="filter-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Provinsi -->
+                    <div>
+                        <label for="province" class="block text-gray-700 font-medium mb-2">Provinsi</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-map text-gray-400"></i>
+                            </div>
+                            <select id="province" name="province" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition appearance-none bg-white">
+                                <option value="">Semua Provinsi</option>
+                                <option value="aceh">Aceh</option>
+                                <option value="sumut">Sumatera Utara</option>
+                                <option value="sumbar">Sumatera Barat</option>
+                                <option value="riau">Riau</option>
+                                <option value="jambi">Jambi</option>
+                                <option value="sumsel">Sumatera Selatan</option>
+                                <option value="bengkulu">Bengkulu</option>
+                                <option value="lampung">Lampung</option>
+                                <option value="babel">Kepulauan Bangka Belitung</option>
+                                <option value="kepri">Kepulauan Riau</option>
+                                <option value="jakarta">DKI Jakarta</option>
+                                <option value="jabar">Jawa Barat</option>
+                                <option value="jateng">Jawa Tengah</option>
+                                <option value="yogya">DI Yogyakarta</option>
+                                <option value="jatim">Jawa Timur</option>
+                                <option value="banten">Banten</option>
+                                <option value="bali">Bali</option>
+                                <option value="ntb">Nusa Tenggara Barat</option>
+                                <option value="ntt">Nusa Tenggara Timur</option>
+                                <option value="kalbar">Kalimantan Barat</option>
+                                <option value="kalteng">Kalimantan Tengah</option>
+                                <option value="kalsel">Kalimantan Selatan</option>
+                                <option value="kaltim">Kalimantan Timur</option>
+                                <option value="kaltara">Kalimantan Utara</option>
+                                <option value="sulut">Sulawesi Utara</option>
+                                <option value="sulteng">Sulawesi Tengah</option>
+                                <option value="sulsel">Sulawesi Selatan</option>
+                                <option value="sultengg">Sulawesi Tenggara</option>
+                                <option value="gorontalo">Gorontalo</option>
+                                <option value="sulbar">Sulawesi Barat</option>
+                                <option value="maluku">Maluku</option>
+                                <option value="malut">Maluku Utara</option>
+                                <option value="papuabarat">Papua Barat</option>
+                                <option value="papua">Papua</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kabupaten/Kota -->
+                    <div>
+                        <label for="city" class="block text-gray-700 font-medium mb-2">Kabupaten/Kota</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-city text-gray-400"></i>
+                            </div>
+                            <select id="city" name="city" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition appearance-none bg-white" disabled>
+                                <option value="">Semua Kabupaten/Kota</option>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Verifikasi -->
+                    <div>
+                        <label for="verification_status" class="block text-gray-700 font-medium mb-2">Status Verifikasi</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-check-circle text-gray-400"></i>
+                            </div>
+                            <select id="verification_status" name="verification_status" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition appearance-none bg-white">
+                                <option value="">Semua Status</option>
+                                <option value="verified">Terverifikasi</option>
+                                <option value="unverified">Belum Terverifikasi</option>
+                                <option value="process">Dalam Proses</option>
+                                <option value="rejected">Ditolak</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Skor Kelayakan -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Skor Kelayakan</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-star text-gray-400"></i>
+                            </div>
+                            <div class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg flex items-center justify-between">
+                                <span id="score-range-label">0 - 100</span>
+                                <i class="fas fa-sliders-h text-gray-400"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 px-2">
+                            <div class="relative">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>0</span>
+                                    <span>25</span>
+                                    <span>50</span>
+                                    <span>75</span>
+                                    <span>100</span>
+                                </div>
+                                <input type="range" id="min-score" name="min-score" min="0" max="100" value="0" class="w-full">
+                                <input type="range" id="max-score" name="max-score" min="0" max="100" value="100" class="w-full mt-2">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kategori Penghasilan -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Kategori Penghasilan</label>
+                        <div class="dropdown-check-list" tabindex="100">
+                            <div class="anchor w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition relative">
+                                <i class="fas fa-money-bill-wave absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <span>Pilih Kategori</span>
+                            </div>
+                            <ul class="items bg-white border border-gray-300 rounded-lg shadow-md">
+                                <li>
+                                    <input type="checkbox" id="income-very-low" name="income[]" value="very-low" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-600">
+                                    <label for="income-very-low" class="ml-2 text-gray-700">Sangat Rendah (< Rp 1.000.000)</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="income-low" name="income[]" value="low" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-600">
+                                    <label for="income-low" class="ml-2 text-gray-700">Rendah (Rp 1.000.000 - Rp 2.000.000)</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="income-medium" name="income[]" value="medium" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-600">
+                                    <label for="income-medium" class="ml-2 text-gray-700">Menengah (Rp 2.000.000 - Rp 4.000.000)</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="income-high" name="income[]" value="high" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-600">
+                                    <label for="income-high" class="ml-2 text-gray-700">Tinggi (> Rp 4.000.000)</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Jenis Bantuan -->
+                    <div>
+                        <label for="aid_type" class="block text-gray-700 font-medium mb-2">Jenis Bantuan</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-hand-holding-heart text-gray-400"></i>
+                            </div>
+                            <select id="aid_type" name="aid_type" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition appearance-none bg-white">
+                                <option value="">Semua Jenis Bantuan</option>
+                                <option value="blt">Bantuan Langsung Tunai (BLT)</option>
+                                <option value="bpnt">Bantuan Pangan Non Tunai (BPNT)</option>
+                                <option value="pkh">Program Keluarga Harapan (PKH)</option>
+                                <option value="kip">Kartu Indonesia Pintar (KIP)</option>
+                                <option value="kis">Kartu Indonesia Sehat (KIS)</option>
+                                <option value="other">Lainnya</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="md:col-span-2 lg:col-span-3 flex flex-col md:flex-row justify-end gap-4 mt-4">
+                        <button type="reset" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out shadow-md flex items-center justify-center">
+                            <i class="fas fa-redo-alt mr-2"></i> Reset Filter
+                        </button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out shadow-md flex items-center justify-center">
+                            <i class="fas fa-search mr-2"></i> Terapkan Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Result Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 animate__animated animate__fadeIn animate__delay-1s">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center mb-4 md:mb-0">
+                        <i class="fas fa-table text-blue-600 mr-2"></i> Hasil Pencarian
+                    </h2>
+                    
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <span class="text-gray-600 bg-gray-100 px-3 py-1 rounded-full flex items-center">
+                            <i class="fas fa-user-friends mr-1"></i> Total: <span id="total-data" class="font-bold ml-1">1,240</span>
+                        </span>
+                        
+                        <div class="dropdown">
+                            <button id="download-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out shadow-md flex items-center">
+                                <i class="fas fa-download mr-2"></i> Download
+                                <i class="fas fa-chevron-down ml-2"></i>
+                            </button>
+                            <div id="download-options" class="hidden absolute bg-white mt-2 rounded-md shadow-lg z-10 w-40">
+                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-file-excel text-green-600 mr-2"></i> Excel
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-file-csv text-blue-600 mr-2"></i> CSV
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-file-pdf text-red-600 mr-2"></i> PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table Container with Horizontal Scroll -->
+                <div class="overflow-x-auto shadow-md rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">No.</th>
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                    <div class="flex items-center">
+                                        NIK
+                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                    <div class="flex items-center">
+                                        Nama Lengkap
+                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                    <div class="flex items-center">
+                                        Alamat
+                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                    <div class="flex items-center">
+                                        Status
+                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                    <div class="flex items-center">
+                                        Skor
+                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                    <div class="flex items-center">
+                                        Kategori
+                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th scope="col" class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                    <div class="flex items-center">
+                                        Bantuan
+                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th scope="col" class="py-3 px-4 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200"
+                            <!-- Row 1 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm text-gray-700">1</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">3171066501880001</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Ahmad Sulaiman</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Jl. Raya Cilandak No. 28, Jakarta Selatan</td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> Terverifikasi
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-16 bg-gray-200 rounded-full mr-2">
+                                            <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                        <span class="text-gray-700 font-medium">85</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Sangat Layak
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-700">BLT, BPNT</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1 tooltip">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="tooltiptext">Lihat Detail</span>
+                                    </button>
+                                    <button class="text-green-600 hover:text-green-800 mx-1 tooltip">
+                                        <i class="fas fa-print"></i>
+                                        <span class="tooltiptext">Cetak Data</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 2 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm text-gray-700">2</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">3275016708900003</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Siti Nurhaliza</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Jl. Pademangan Raya No. 42, Jakarta Utara</td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> Terverifikasi
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-16 bg-gray-200 rounded-full mr-2">
+                                            <div class="h-full bg-green-500 rounded-full" style="width: 80%"></div>
+                                        </div>
+                                        <span class="text-gray-700 font-medium">80</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Sangat Layak
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-700">PKH, KIS</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1 tooltip">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="tooltiptext">Lihat Detail</span>
+                                    </button>
+                                    <button class="text-green-600 hover:text-green-800 mx-1 tooltip">
+                                        <i class="fas fa-print"></i>
+                                        <span class="tooltiptext">Cetak Data</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 3 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm text-gray-700">3</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">3273032405950002</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Budi Santoso</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Jl. Pahlawan No. 123, Jakarta Selatan</td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        <i class="fas fa-clock mr-1"></i> Dalam Proses
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-16 bg-gray-200 rounded-full mr-2">
+                                            <div class="h-full bg-gray-400 rounded-full" style="width: 0%"></div>
+                                        </div>
+                                        <span class="text-gray-700 font-medium">-</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Belum Dinilai
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-700">-</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1 tooltip">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="tooltiptext">Lihat Detail</span>
+                                    </button>
+                                    <button class="text-green-600 hover:text-green-800 mx-1 tooltip">
+                                        <i class="fas fa-print"></i>
+                                        <span class="tooltiptext">Cetak Data</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 4 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm text-gray-700">4</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">3175025306780005</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Dewi Kartika</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Jl. Gatot Subroto No. 56, Jakarta Pusat</td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> Terverifikasi
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-16 bg-gray-200 rounded-full mr-2">
+                                            <div class="h-full bg-yellow-500 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                        <span class="text-gray-700 font-medium">65</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Layak
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-700">BPNT, KIP</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1 tooltip">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="tooltiptext">Lihat Detail</span>
+                                    </button>
+                                    <button class="text-green-600 hover:text-green-800 mx-1 tooltip">
+                                        <i class="fas fa-print"></i>
+                                        <span class="tooltiptext">Cetak Data</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 5 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm text-gray-700">5</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">3674051204850001</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Agus Hermawan</td>
+                                <td class="py-3 px-4 text-sm text-gray-700">Jl. Merdeka No. 78, Tangerang</td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        <i class="fas fa-times-circle mr-1"></i> Ditolak
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-16 bg-gray-200 rounded-full mr-2">
+                                            <div class="h-full bg-red-500 rounded-full" style="width: 30%"></div>
+                                        </div>
+                                        <span class="text-gray-700 font-medium">30</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Tidak Layak
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-700">-</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1 tooltip">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="tooltiptext">Lihat Detail</span>
+                                    </button>
+                                    <button class="text-green-600 hover:text-green-800 mx-1 tooltip">
+                                        <i class="fas fa-print"></i>
+                                        <span class="tooltiptext">Cetak Data</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex items-center justify-between mt-6">
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-700">
+                            Menampilkan <span class="font-medium">1</span> sampai <span class="font-medium">5</span> dari <span class="font-medium">1,240</span> data
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <button disabled class="px-3 py-1 rounded-md bg-gray-100 text-gray-400 cursor-not-allowed">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-3 py-1 rounded-md bg-blue-600 text-white">1</button>
+                        <button class="px-3 py-1 rounded-md hover:bg-gray-100">2</button>
+                        <button class="px-3 py-1 rounded-md hover:bg-gray-100">3</button>
+                        <span class="px-3 py-1">...</span>
+                        <button class="px-3 py-1 rounded-md hover:bg-gray-100">248</button>
+                        <button class="px-3 py-1 rounded-md hover:bg-gray-100">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analytics Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 animate__animated animate__fadeIn animate__delay-2s">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-chart-bar text-blue-600 mr-2"></i> Analisis Data
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Chart 1: Distribution by Score -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Distribusi Berdasarkan Skor Kelayakan</h3>
+                        <div class="chart-container">
+                            <canvas id="scoreDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Chart 2: Distribution by Region -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Distribusi Berdasarkan Wilayah</h3>
+                        <div class="chart-container">
+                            <canvas id="regionDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Chart 3: Distribution by Aid Type -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Distribusi Berdasarkan Jenis Bantuan</h3>
+                        <div class="chart-container">
+                            <canvas id="aidTypeDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Chart 4: Distribution by Income Category -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Distribusi Berdasarkan Kategori Penghasilan</h3>
+                        <div class="chart-container">
+                            <canvas id="incomeDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Summary Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-users text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Total Pendaftar</p>
+                                <p class="text-2xl font-bold text-gray-800">1,240</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Terverifikasi</p>
+                                <p class="text-2xl font-bold text-gray-800">986</p>
+                                <p class="text-xs text-green-600">79.5% dari total</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Dalam Proses</p>
+                                <p class="text-2xl font-bold text-gray-800">195</p>
+                                <p class="text-xs text-yellow-600">15.7% dari total</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Ditolak</p>
+                                <p class="text-2xl font-bold text-gray-800">59</p>
+                                <p class="text-xs text-red-600">4.8% dari total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8">
+            <div class="text-center">
+                <img src="./assets/logo banscor.png" alt="Logo BANSOS SCORE" class="h-10 w-auto mx-auto mb-4">
+                <p class="text-gray-400 mb-4">&copy; 2025 BANSOS SCORE. Kementerian Sosial Republik Indonesia</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
